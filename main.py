@@ -22,6 +22,45 @@ import numpy as np
 
 ##################### Functions ########################
 
+class Human:
+
+    dx = 1
+    dy = 1
+
+    def __init__(self, x, y, group, action, x_home, y_home, x_work, y_work):
+        self.x = x
+        self.y = y
+        self.group = group
+        self.action = action
+        self.x_home = x_home
+        self.y_home = y_home
+        self.x_work = x_work
+        self.y_work = y_work
+
+
+    def actionGoHome(self):
+        if self.x < self.x_home:
+            self.x = self.x + self.dx
+        if self.x > self.x_home:
+            self.x = self.x - self.dx
+        if self.y < self.y_home:
+            self.y = self.y + self.dy
+        if self.y > self.y_home:
+            self.y = self.y - self.dy
+
+    def actionGoWork(self):
+        if self.x < self.x_work:
+            self.x = self.x + self.dx
+        if self.x > self.x_work:
+            self.x = self.x - self.dx
+        if self.y < self.y_work:
+            self.y = self.y + self.dy
+        if self.y > self.y_work:
+            self.y = self.y - self.dy
+
+ #   def actionWalkFree(self):
+
+
 
 
 def on_press(key):
