@@ -39,7 +39,6 @@ def proximity(x1,y1,x2,y2):
 
 ### Groups ###
 
-N = 1800  # Population
 S = 1799  # Susceptible
 E = 0  # Exposed
 I = 1  # Infected
@@ -48,6 +47,12 @@ I_icu = 0  # Infected ICU (ventilator)
 R = 0  # Recovered
 D = 0  # Deceased
 Q = 0  # Quarantined
+N = S + E + I + R  # Population
+
+Sarray=[]
+Earray=[]
+Iarray=[]
+Rarray=[]
 
 
 ### Agents ###
@@ -67,47 +72,76 @@ for n in range(N):
 
 ### Parameters ###
 
-b = 0.001  # rate of contact/ contact rate
+b = 0.001  # infectious rate, controls the rate of spread which represents the probability of transmitting disease between a susceptible and an infectious individual.
 q = 0.01  # b/g # contact ratio
-g = 0.05  # b / q
+g = 0.05  # b / q # recovery rate
+e = 0.1  # incubation rate is the rate of latent individuals becoming infectious (average duration of incubation is 1/σ)
 
 
 ## Sim Time ##
 
-T = 1000  # Time horizon
+T = 0  # Time horizon
+timepassed=[]
 
 ### Constraints ###
 
 I_hosp_max = N * 0.02
 I_icu_max = N * 0.01
 
+timepassed.append(T)
+Sarray.append(S)
+Earray.append(E)
+Iarray.append(I)
+Rarray.append(R)
 
 ##################### Main Loop ########################
 
 done = False
 while not done:
-    print("S: ", S, "I: ", I, "R: ", R)
+    print("S: ", S, "E: ", E, "I: ", I, "R: ", R, "time: ", T)
 
+    T = T + 1
 
     S1 = S
+    E1 = E
     I1 = I
     R1 = R
 
     Sdot = - b * I * S
-    Idot = b * I * S - g * I
+    Edot = b * I * S - e * E
+    Idot = e * E - g * I
     Rdot = g * I
 
     S = S1 + Sdot
+    E = E1 + Edot
     I = I1 + Idot
     R = R1 + Rdot
 
     if S < 0:
         S = 0
+    if E > N:
+        E = N
     if I > N:
         I = N
     if R > N:
         R = N
 
-    listener = keyboard.Listener(on_press=on_press)
-    listener.start()  # start to listen on a separate thread
-    listener.join()  # remove if main thread is polling self.keys
+    timepassed.append(T)
+    Sarray.append(S)
+    Earray.append(E)
+    Iarray.append(I)
+    Rarray.append(R)
+
+
+#    listener = keyboard.Listener(on_press=on_press)
+#    listener.start()  # start to listen on a separate thread
+#    listener.join()  # remove if main thread is polling self.keys
+
+#    print("End loop ?")
+#    end = input()
+    if T == 150:
+        done = True
+
+plt.plot(timepassed,Sarray,'g',timepassed,Earray,'y',timepassed,Iarray,'r',timepassed,Rarray,'b')
+plt.show()
+
