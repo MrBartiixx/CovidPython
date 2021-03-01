@@ -15,7 +15,7 @@ SIR model
 import math
 import random
 
-from pynput import keyboard
+#from pynput import keyboard
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -63,9 +63,9 @@ class Human:
 
 
 
-def on_press(key):
-    if key == keyboard.Key.esc:
-        return False  # stop listener
+#def on_press(key):
+ #   if key == keyboard.Key.esc:
+  #      return False  # stop listener
 
 
 def proximity(x1,y1,x2,y2):
