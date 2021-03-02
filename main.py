@@ -86,7 +86,7 @@ I_icu = 0  # Infected ICU (ventilator)
 R = 0  # Recovered
 D = 0  # Deceased
 Q = 0  # Quarantined
-N = S + E + I + R  # Population
+N: int = S + E + I + R  # Population
 
 Sarray=[]
 Earray=[]
@@ -96,7 +96,7 @@ Rarray=[]
 
 ### Agents ###
 
-PPL = np.zeros((N, 4))  # [x,y,group,action]
+PPL = []  # [x,y,group,action]
 ACT = np.array(['Home', 'Work', 'WalkFree', 'Movement'])
 
 
@@ -134,6 +134,11 @@ Iarray.append(I)
 Rarray.append(R)
 
 ##################### Main Loop ########################
+
+#for i in N:
+#    PPL.append(Human(1,1,1,1,1,1))
+
+
 
 done = False
 while not done:
