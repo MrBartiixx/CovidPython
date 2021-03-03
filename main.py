@@ -69,6 +69,15 @@ class House:
         self.dx = dx
         self.dy = dy
         self.no_residents = no_residents
+        
+
+class Workplace:
+    def __init__(self, x, y, dx, dy, no_workers):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+        self.no_workers = no_workers
 
 
 
@@ -108,11 +117,13 @@ Rarray=[]
 PPL = []  # [x,y,group,action]
 ACT = np.array(['Home', 'Work', 'WalkFree', 'Movement'])
 HOU=[]
+WRP=[]
 
 family_size = 3
 homeless_rate = 0.0005
 no_houses = int((N - N * homeless_rate)/family_size)
 unemployment_rate = 0.12
+no_workplaces = 50
 
 
 
@@ -175,13 +186,16 @@ for f in range(no_houses):
         HOU.append(House(x, y, dx, dy, 0))
         done1 = True
         
-        # for house in HOU:
-        #     if x - house.x < 10 & x - house.x > -10 & y - house.y < 10 & y - house.y > -10:
-        #         break
-        #     else:
-        #         HOU.append(House(x, y, dx, dy, 0))
-        #         done1 = True
-
+### Spawn workplaces ###
+for f in range(no_workplaces):
+    done1 = False
+    while not done1:
+        x = int(random.uniform(0, Length+1))
+        y = int(random.uniform(0, Width+1))
+        dx = int(random.uniform(1,7))
+        dy = int(random.uniform(1,7))
+        WRP.append(Workplace(x, y, dx, dy, 0))
+        done1 = True
 
 ### Spawn people ###
 
@@ -189,12 +203,13 @@ for i in range(1):
     PPL.append(Human(1,1,0,0,1,1,-1,-1,-1,-1))
 
 for i in range(N-2):
-    PPL.append(Human(1,1,0,0,0,0,-1,-1,100,100))
+    PPL.append(Human(1,1,0,0,0,0,-1,-1,-1,-1))
 
 for i in range(1):
-    PPL.append(Human(1,1,2,0,0,0,-1,-1,100,100))
+    PPL.append(Human(1,1,2,0,0,0,-1,-1,-1,-1))
 
-
+random.shuffle(HOU)
+random.shuffle(PPL)
 for house in HOU:
     ff = int(random.uniform(2,5))
     temp = 0
@@ -205,23 +220,49 @@ for house in HOU:
                 person.y_home = house.y
                 person.x = house.x
                 person.y = house.y
+                house.no_residents = house.no_residents + 1 
+                temp = temp + 1
+                if temp == ff:
+                    break
+
+random.shuffle(WRP)
+random.shuffle(PPL)
+for workplace in WRP:
+    ff = int(random.uniform(20, 61))
+    temp = 0
+    for person in PPL:
+        if person.unemployed == 0:
+            if person.x_work == -1:
+                person.x_work = workplace.x
+                person.y_work = workplace.y
+                workplace.no_workers = workplace.no_workers + 1 
                 temp = temp + 1
                 if temp == ff:
                     break
 
 housesx = []
 housesy = []
+worksx = []
+worksy = []
 for house in HOU:
     housesx.append(house.x)
     housesy.append(house.y)
+for work in WRP:
+    worksx.append(work.x)
+    worksy.append(work.y)
     
 plt.plot(housesy, housesx, 'o', color='black')
+plt.plot(worksy, worksx, 'o', color='green')
 plt.show()
+
+for person in PPL:
+    if person.x_work > 1000 & person.x_work < 0 & person.y_work > 1000 & person.y_work < 0 & person.x_home > 1000 & person.x_home < 0 & person.y_home > 1000 & person.y_home < 0:
+        print(person)
 
 
 done = False
 while not done:
-    print("S: ", S, "E: ", E, "I: ", I, "R: ", R, "time: ", T)
+    #print("S: ", S, "E: ", E, "I: ", I, "R: ", R, "time: ", T)
 
     T = T + 1
 
