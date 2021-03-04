@@ -27,7 +27,7 @@ class Human:
     dx = 1
     dy = 1
 
-    def __init__(self, x, y, group, action, homeless, unemployed, x_home, y_home, x_work, y_work):
+    def __init__(self, x, y, group, action, homeless, unemployed, x_home, y_home, x_work, y_work, house, work):
         self.x = x
         self.y = y
         self.group = group
@@ -38,26 +38,91 @@ class Human:
         self.y_home = y_home
         self.x_work = x_work
         self.y_work = y_work
+        self.house = house
+        self.work = work
 
     def actionGoHome(self):
-        if self.x < self.x_home:
-            self.x = self.x + self.dx
-        if self.x > self.x_home:
-            self.x = self.x - self.dx
-        if self.y < self.y_home:
-            self.y = self.y + self.dy
-        if self.y > self.y_home:
-            self.y = self.y - self.dy
-
+        # IF person not in home, at this function call, move person by 1 px towards home
+        if self.x < self.house.x - self.house.dx or self.x > self.house.x + self.house.dx or self.y < self.house.y - self.house.dy or self.y > self.house.y + self.house.dy:
+            if self.x < self.x_home:
+                self.x = self.x + self.dx
+            if self.x > self.x_home:
+                self.x = self.x - self.dx
+            if self.y < self.y_home:
+                self.y = self.y + self.dy
+            if self.y > self.y_home:
+                self.y = self.y - self.dy
+    
+    def actionStayHome(self):
+        # If person at home, stay at px or move with probability inside home
+        if self.x >= self.house.x - self.house.dx or self.x <= self.house.x + self.house.dx or self.y >= self.house.y - self.house.dy or self.y <= self.house.y + self.house.dy:
+            eps = random.Random()
+            if eps > 0.6 and eps < 0.7:
+                self.x = self.x + self.dx
+                self.y = self.y + self.dy
+            if eps > 0.7 and eps < 0.8:
+                self.x = self.x - self.dx
+                self.y = self.y - self.dy
+            if eps > 0.8 and eps < 0.85:
+                self.x =self.x - self.dx
+            if eps > 0.85 and eps < 0.9:
+                self.x =self.x + self.dx
+            if eps > 0.9 and eps < 0.95:
+                self.y =self.y - self.dy
+            if eps > 0.95:
+                self.y =self.y + self.dy      
+            if self.x > self.house.x + self.house.dx:
+                self.x = self.house.x + self.house.dx - 1
+            if self.x > self.house.x - self.house.dx:
+                self.x = self.house.x - self.house.dx + 1
+            if self.y > self.house.y + self.house.dy:
+                self.y = self.house.y + self.house.dy - 1
+            if self.y > self.house.y - self.house.dy:
+                self.y = self.house.y - self.house.dy + 1   
+    
+    
     def actionGoWork(self):
-        if self.x < self.x_work:
-            self.x = self.x + self.dx
-        if self.x > self.x_work:
-            self.x = self.x - self.dx
-        if self.y < self.y_work:
-            self.y = self.y + self.dy
-        if self.y > self.y_work:
-            self.y = self.y - self.dy
+        # IF person not in work, at this function call, move person by 1 px towards work
+        if self.x < self.work.x - self.work.dx or self.x > self.work.x + self.work.dx or self.y < self.work.y - self.work.dy or self.y > self.work.y + self.work.dy:
+            if self.x < self.x_work:
+                self.x = self.x + self.dx
+            if self.x > self.x_work:
+                self.x = self.x - self.dx
+            if self.y < self.y_work:
+                self.y = self.y + self.dy
+            if self.y > self.y_work:
+                self.y = self.y - self.dy
+
+    def actionStayAtWork(self):
+        # If person at work, stay at px or move with probability inside work
+        if self.x >= self.work.x - self.work.dx or self.x <= self.work.x + self.work.dx or self.y >= self.work.y - self.work.dy or self.y <= self.work.y + self.work.dy:
+            eps = random.Random()
+            if eps > 0.6 and eps < 0.7:
+                self.x = self.x + self.dx
+                self.y = self.y + self.dy
+            if eps > 0.7 and eps < 0.8:
+                self.x = self.x - self.dx
+                self.y = self.y - self.dy
+            if eps > 0.8 and eps < 0.85:
+                self.x =self.x - self.dx
+            if eps > 0.85 and eps < 0.9:
+                self.x =self.x + self.dx
+            if eps > 0.9 and eps < 0.95:
+                self.y =self.y - self.dy
+            if eps > 0.95:
+                self.y =self.y + self.dy            
+            if self.x > self.work.x + self.work.dx:
+                self.x = self.work.x + self.work.dx - 1
+            if self.x > self.work.x - self.work.dx:
+                self.x = self.work.x - self.work.dx + 1
+            if self.y > self.work.y + self.work.dy:
+                self.y = self.work.y + self.work.dy - 1
+            if self.y > self.work.y - self.work.dy:
+                self.y = self.work.y - self.work.dy + 1    
+
+            
+            
+            
 
 #    def actionWalkFree(self):
 
@@ -86,8 +151,10 @@ class Workplace:
   #      return False  # stop listener
 
 
-def proximity(x1,y1,x2,y2):
-    return math.sqrt(math.pow(x1-x2,2)+math.pow(y1-y2,2))
+def contact(person1,person2):
+    if person1.x == person2.x and person1.y == person2.y:
+        return True
+    return False
 
 
 
@@ -199,14 +266,19 @@ for f in range(no_workplaces):
 
 ### Spawn people ###
 
+emptyWork = Workplace(0,0,0,0,0)
+empytHouse = House(0, 0, 0, 0, 0)
+
+
+
 for i in range(1):
-    PPL.append(Human(1,1,0,0,1,1,-1,-1,-1,-1))
+    PPL.append(Human(1,1,0,0,1,1,-1,-1,-1,-1,empytHouse,emptyWork))
 
 for i in range(N-2):
-    PPL.append(Human(1,1,0,0,0,0,-1,-1,-1,-1))
+    PPL.append(Human(1,1,0,0,0,0,-1,-1,-1,-1,empytHouse,emptyWork))
 
 for i in range(1):
-    PPL.append(Human(1,1,2,0,0,0,-1,-1,-1,-1))
+    PPL.append(Human(1,1,2,0,0,0,-1,-1,-1,-1,empytHouse,emptyWork))
 
 random.shuffle(HOU)
 random.shuffle(PPL)
@@ -216,6 +288,7 @@ for house in HOU:
     for person in PPL:
         if person.homeless == 0:
             if person.x_home == -1:
+                person.house = house
                 person.x_home = house.x
                 person.y_home = house.y
                 person.x = house.x
@@ -233,6 +306,7 @@ for workplace in WRP:
     for person in PPL:
         if person.unemployed == 0:
             if person.x_work == -1:
+                person.work = workplace
                 person.x_work = workplace.x
                 person.y_work = workplace.y
                 workplace.no_workers = workplace.no_workers + 1 
@@ -263,6 +337,21 @@ for person in PPL:
 done = False
 while not done:
     #print("S: ", S, "E: ", E, "I: ", I, "R: ", R, "time: ", T)
+    
+    for hour in range(24):
+        if hour > -1 & hour < 8:
+            for timestamp in range(600):
+                for person in PPL:
+                     if person.unemployed == 0:
+                         person.actionGoWork()
+                         person.actionStayAtWork()
+                         for person2 in PPL:
+                             if contact(person,person2):
+                                 if person.group == 2:
+                                     person2.group = 1
+                                 if person2.group == 2:
+                                     person.group = 1
+        if hour > 7 & hour < :
 
     T = T + 1
 
