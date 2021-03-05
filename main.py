@@ -42,6 +42,9 @@ class Human:
         self.work = work
 
     def actionGoHome(self):
+        if self.x - self.house.x > 300 or self.x - self.house.x < -300 or self.y - self.house.y > 300 or self.y - self.house.y < -300:
+            self.x = self.house.x
+            self.y = self.house.y
         # IF person not in home, at this function call, move person by 1 px towards home
         if self.x < self.house.x - self.house.dx or self.x > self.house.x + self.house.dx or self.y < self.house.y - self.house.dy or self.y > self.house.y + self.house.dy:
             if self.x < self.x_home:
@@ -56,7 +59,7 @@ class Human:
     def actionStayHome(self):
         # If person at home, stay at px or move with probability inside home
         if self.x >= self.house.x - self.house.dx or self.x <= self.house.x + self.house.dx or self.y >= self.house.y - self.house.dy or self.y <= self.house.y + self.house.dy:
-            eps = random.Random()
+            eps = np.random.rand()
             if eps > 0.6 and eps < 0.7:
                 self.x = self.x + self.dx
                 self.y = self.y + self.dy
@@ -82,6 +85,9 @@ class Human:
     
     
     def actionGoWork(self):
+        if self.x - self.work.x > 300 or self.x - self.work.x < -300 or self.y - self.work.y > 300 or self.y - self.work.y < -300:
+            self.x = self.work.x
+            self.y = self.work.y
         # IF person not in work, at this function call, move person by 1 px towards work
         if self.x < self.work.x - self.work.dx or self.x > self.work.x + self.work.dx or self.y < self.work.y - self.work.dy or self.y > self.work.y + self.work.dy:
             if self.x < self.x_work:
@@ -96,7 +102,7 @@ class Human:
     def actionStayAtWork(self):
         # If person at work, stay at px or move with probability inside work
         if self.x >= self.work.x - self.work.dx or self.x <= self.work.x + self.work.dx or self.y >= self.work.y - self.work.dy or self.y <= self.work.y + self.work.dy:
-            eps = random.Random()
+            eps = np.random.rand()
             if eps > 0.6 and eps < 0.7:
                 self.x = self.x + self.dx
                 self.y = self.y + self.dy
@@ -124,8 +130,17 @@ class Human:
             
             
 
-#    def actionWalkFree(self):
-
+    def actionWalkFree(self):
+        eps = np.random.rand()
+        if eps < 0.25:
+            self.x = self.x + self.dx
+        if eps >= 0.25 and eps <= 0.5:
+            self.y = self.y + self.dy
+        if eps > 0.5 and eps <= 0.75:
+            self.x = self.x - self.dx
+        if eps > 0.75:
+            self.y = self.y - self.dy
+        
 
 class House:
     def __init__(self, x, y, dx, dy, no_residents):
@@ -149,11 +164,24 @@ class Workplace:
 #def on_press(key):
  #   if key == keyboard.Key.esc:
   #      return False  # stop listener
+  
 
 
-def contact(person1,person2):
-    if person1.x == person2.x and person1.y == person2.y:
-        return True
+def contact(person1, person2):    
+    if PPL.index(person1) != PPL.index(person2) and person1.group != 3 and person2.group !=3 and person1.group == 2 or person2.group == 2:
+        if person1.x == person2.x and person1.y == person2.y:
+            if person1.x < person1.house.x + person1.house.dx and person1.x > person1.house.x - person1.house.dx and person1.y < person1.house.y + person1.house.dy and person1.y > person1.house.y - person1.house.dy:
+                return False
+            else:
+                if person2.x < person2.house.x + person2.house.dx and person2.x > person2.house.x - person2.house.dx and person2.y < person2.house.y + person2.house.dy and person2.y > person2.house.y - person2.house.dy:
+                    return False
+                else:
+                    if person1.group == 2:
+                        person2.group = 1
+                    if person2.group == 2:
+                        person1.group = 1
+                    return True
+        return False
     return False
 
 
@@ -177,6 +205,8 @@ Sarray=[]
 Earray=[]
 Iarray=[]
 Rarray=[]
+
+contactsPerDay = 0
 
 
 ### Agents ###
@@ -325,9 +355,9 @@ for work in WRP:
     worksx.append(work.x)
     worksy.append(work.y)
     
-plt.plot(housesy, housesx, 'o', color='black')
-plt.plot(worksy, worksx, 'o', color='green')
-plt.show()
+#plt.plot(housesy, housesx, 'o', color='black')
+#plt.plot(worksy, worksx, 'o', color='green')
+#plt.show()
 
 for person in PPL:
     if person.x_work > 1000 & person.x_work < 0 & person.y_work > 1000 & person.y_work < 0 & person.x_home > 1000 & person.x_home < 0 & person.y_home > 1000 & person.y_home < 0:
@@ -336,23 +366,61 @@ for person in PPL:
 
 done = False
 while not done:
-    #print("S: ", S, "E: ", E, "I: ", I, "R: ", R, "time: ", T)
+    print("S: ", S, "E: ", E, "I: ", I, "R: ", R, "time: ", T)
     
     for hour in range(24):
-        if hour > -1 & hour < 8:
+        # for person in PPL:
+        #     if person.unemployed == 1 or person.homeless == 1:
+        #         person.actionWalkFree()
+                
+        if hour >= 0 & hour < 8:
             for timestamp in range(600):
                 for person in PPL:
-                     if person.unemployed == 0:
+                     if person.homeless == 0:
+                         person.actionGoHome()
+                         person.actionStayHome()
+                         for person2 in PPL:
+                             if contact(person,person2):
+                                 contactsPerDay = contactsPerDay + 1
+                print("Timestamp passed: ", timestamp)
+                                 
+                             
+        if hour > 7 & hour < 12:
+            for timestamp in range(600):
+                for person in PPL:
+                    if person.unemployed == 0:
                          person.actionGoWork()
                          person.actionStayAtWork()
                          for person2 in PPL:
                              if contact(person,person2):
-                                 if person.group == 2:
-                                     person2.group = 1
-                                 if person2.group == 2:
-                                     person.group = 1
-        if hour > 7 & hour < :
-
+                                 contactsPerDay = contactsPerDay + 1
+                             
+        if hour > 11 & hour < 13:
+            for timestamp in range(600):
+                for person in PPL:
+                    person.actionWalkFree()
+                    for person2 in PPL:
+                        if contact(person,person2):
+                            contactsPerDay = contactsPerDay + 1                             
+        if hour > 14 & hour < 19:
+            for timestamp in range(600):
+                for person in PPL:
+                    if person.unemployed == 0:
+                         person.actionGoWork()
+                         person.actionStayAtWork()
+                         for person2 in PPL:
+                             if contact(person,person2):
+                                 contactsPerDay = contactsPerDay + 1                             
+        if hour > 18 & hour < 0:
+            for timestamp in range(600):
+                for person in PPL:
+                    person.actionWalkFree()
+                    for person2 in PPL:
+                        if contact(person,person2):
+                            contactsPerDay = contactsPerDay + 1        
+        
+        print("Hour passed: ", hour)
+        
     T = T + 1
 
     S1 = S
@@ -360,8 +428,8 @@ while not done:
     I1 = I
     R1 = R
 
-    Sdot = - b * I * S
-    Edot = b * I * S - e * E
+    Sdot = - b * contactsPerDay
+    Edot = b * contactsPerDay - e * E
     Idot = e * E - g * I
     Rdot = g * I
 
@@ -384,6 +452,8 @@ while not done:
     Earray.append(E)
     Iarray.append(I)
     Rarray.append(R)
+    
+    contactsPerDay = 0
 
 
 #    listener = keyboard.Listener(on_press=on_press)
