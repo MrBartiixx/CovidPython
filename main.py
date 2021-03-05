@@ -191,7 +191,7 @@ def contact(person1, person2):
 
 ### Groups ###
 
-S = 1799  # Susceptible
+S = 399  # Susceptible
 E = 0  # Exposed
 I = 1  # Infected
 I_hosp = 0  # Infected hospitalized
@@ -220,14 +220,14 @@ family_size = 3
 homeless_rate = 0.0005
 no_houses = int((N - N * homeless_rate)/family_size)
 unemployment_rate = 0.12
-no_workplaces = 50
+no_workplaces = 20
 
 
 
 ### Environment ###
 
-Length = 1000
-Width = 1000
+Length = 300
+Width = 300
 
 # each pixel corresponds to area 5x5 meters.
 
@@ -374,7 +374,7 @@ while not done:
         #         person.actionWalkFree()
                 
         if hour >= 0 & hour < 8:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                      if person.homeless == 0:
                          person.actionGoHome()
@@ -382,11 +382,10 @@ while not done:
                          for person2 in PPL:
                              if contact(person,person2):
                                  contactsPerDay = contactsPerDay + 1
-                print("Timestamp passed: ", timestamp)
                                  
                              
         if hour > 7 & hour < 12:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     if person.unemployed == 0:
                          person.actionGoWork()
@@ -396,14 +395,14 @@ while not done:
                                  contactsPerDay = contactsPerDay + 1
                              
         if hour > 11 & hour < 13:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     person.actionWalkFree()
                     for person2 in PPL:
                         if contact(person,person2):
                             contactsPerDay = contactsPerDay + 1
         if hour > 14 & hour < 19:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     if person.unemployed == 0:
                          person.actionGoWork()
@@ -412,7 +411,7 @@ while not done:
                              if contact(person,person2):
                                  contactsPerDay = contactsPerDay + 1     
         if hour > 18 & hour < 0:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     person.actionWalkFree()
                     for person2 in PPL:
