@@ -165,10 +165,10 @@ class Workplace:
  #   if key == keyboard.Key.esc:
   #      return False  # stop listener
   
-
+#PPL.index(person1) != PPL.index(person2) and
 
 def contact(person1, person2):    
-    if PPL.index(person1) != PPL.index(person2) and person1.group != 3 and person2.group !=3 and person1.group == 2 or person2.group == 2:
+    if person1 != person2 and person1.group != 3 and person2.group !=3 and person1.group == 2 or person2.group == 2:
         if person1.x == person2.x and person1.y == person2.y:
             if person1.x < person1.house.x + person1.house.dx and person1.x > person1.house.x - person1.house.dx and person1.y < person1.house.y + person1.house.dy and person1.y > person1.house.y - person1.house.dy:
                 return False
@@ -191,7 +191,7 @@ def contact(person1, person2):
 
 ### Groups ###
 
-S = 1799  # Susceptible
+S = 399  # Susceptible
 E = 0  # Exposed
 I = 1  # Infected
 I_hosp = 0  # Infected hospitalized
@@ -220,14 +220,14 @@ family_size = 3
 homeless_rate = 0.0005
 no_houses = int((N - N * homeless_rate)/family_size)
 unemployment_rate = 0.12
-no_workplaces = 50
+no_workplaces = 20
 
 
 
 ### Environment ###
 
-Length = 1000
-Width = 1000
+Length = 300
+Width = 300
 
 # each pixel corresponds to area 5x5 meters.
 
@@ -355,9 +355,9 @@ for work in WRP:
     worksx.append(work.x)
     worksy.append(work.y)
     
-#plt.plot(housesy, housesx, 'o', color='black')
-#plt.plot(worksy, worksx, 'o', color='green')
-#plt.show()
+plt.plot(housesy, housesx, 'o', color='black')
+plt.plot(worksy, worksx, 'o', color='green')
+plt.show()
 
 for person in PPL:
     if person.x_work > 1000 & person.x_work < 0 & person.y_work > 1000 & person.y_work < 0 & person.x_home > 1000 & person.x_home < 0 & person.y_home > 1000 & person.y_home < 0:
@@ -374,7 +374,7 @@ while not done:
         #         person.actionWalkFree()
                 
         if hour >= 0 & hour < 8:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                      if person.homeless == 0:
                          person.actionGoHome()
@@ -382,11 +382,10 @@ while not done:
                          for person2 in PPL:
                              if contact(person,person2):
                                  contactsPerDay = contactsPerDay + 1
-                print("Timestamp passed: ", timestamp)
                                  
                              
         if hour > 7 & hour < 12:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     if person.unemployed == 0:
                          person.actionGoWork()
@@ -396,30 +395,32 @@ while not done:
                                  contactsPerDay = contactsPerDay + 1
                              
         if hour > 11 & hour < 13:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     person.actionWalkFree()
                     for person2 in PPL:
                         if contact(person,person2):
-                            contactsPerDay = contactsPerDay + 1                             
+                            contactsPerDay = contactsPerDay + 1
         if hour > 14 & hour < 19:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     if person.unemployed == 0:
                          person.actionGoWork()
                          person.actionStayAtWork()
                          for person2 in PPL:
                              if contact(person,person2):
-                                 contactsPerDay = contactsPerDay + 1                             
+                                 contactsPerDay = contactsPerDay + 1     
         if hour > 18 & hour < 0:
-            for timestamp in range(600):
+            for timestamp in range(200):
                 for person in PPL:
                     person.actionWalkFree()
                     for person2 in PPL:
                         if contact(person,person2):
-                            contactsPerDay = contactsPerDay + 1        
+                            contactsPerDay = contactsPerDay + 1
         
         print("Hour passed: ", hour)
+        
+        
         
     T = T + 1
 
