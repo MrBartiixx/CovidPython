@@ -360,7 +360,7 @@ plt.plot(worksy, worksx, 'o', color='green')
 plt.show()
 
 for person in PPL:
-    if person.x_work > 1000 & person.x_work < 0 & person.y_work > 1000 & person.y_work < 0 & person.x_home > 1000 & person.x_home < 0 & person.y_home > 1000 & person.y_home < 0:
+    if person.x_work > 300 & person.x_work < 0 & person.y_work > 300 & person.y_work < 0 & person.x_home > 300 & person.x_home < 0 & person.y_home > 300 & person.y_home < 0:
         print(person)
 
 
